@@ -74,9 +74,12 @@ String::~String()
 }
 String& String::operator =(const String& a)
 {
+	if (this == &a)
+		return *this;
 	if (a.data != nullptr && a.data[0] != '\0')
 	{
 		size = a.size;
+		delete[] data;
 		data = new char[size + 1];
 		int i;
 		for (i = 0; i < size; i++)
@@ -196,7 +199,7 @@ String::operator double() const
 			frac = frac * 10 + (data[i] - '0');
 			ten *= 10;
 		}
-		
+		i++;
 		
 	}
 	double result = num + (frac / ten);
@@ -205,7 +208,7 @@ String::operator double() const
 }
 String::operator bool() const
 {
-	return (data == nullptr || data[0] == '\0');
+	return (data != nullptr && data[0] != '\0');
 }
 void String::copyString(const char* src)
 {
@@ -245,6 +248,8 @@ int String::getIntegerLength(const long long int num)
 
 int String::getLength() const
 {
+	if (!data)
+		return 0;
 	int i = 0;
 	while (data[i] != '\0')
 	{
@@ -268,7 +273,7 @@ int String::getSize() const
 
 void String::display() const
 {
-	if (operator bool())
+	if (!operator bool())
 	{
 		cout << "Empty String";
 		return;
@@ -343,7 +348,7 @@ void String::reSize(int capacity)
 			i++;
 		}
 		temp[i] = '\0';
-		this->~String();
+		delete[] data; //this->~String();
 		size = capacity;
 		data = temp;
 	}
@@ -377,26 +382,18 @@ int String::replace(const String& old, const  String& newSubStr)
 
 int String::operator==(const String& s2) const
 {
-	int cCalling = 0, cReceiving = 0, j = 0, i = 0, k = 0;
-	while (data[i] != '\0' || s2.data[i] != '\0')
+	int i = 0;
+
+	while (data[i] != '\0' && s2.data[i] != '\0')
 	{
-		if (data[j] != '\0')
+		if (data[i] != s2.data[i])
 		{
-			cCalling = cCalling + data[i];
-			j++;
-		}
-		if (s2.data[k] != '\0')
-		{
-			cReceiving = cReceiving + s2.data[i];
-			k++;
+			return false;
 		}
 		i++;
 	}
-	if (cCalling == cReceiving)
-	{
-		return 0;
-	}
-	return (cCalling > cReceiving) ? 1 : -1;
+\
+	return (data[i] == '\0' && s2.data[i] == '\0');
 }
 
 String String::operator+(const String& s2) const
